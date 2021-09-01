@@ -12,22 +12,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package logger
 
 var (
 	DefaultLogger = Config{
-		Stdout:       true,
-		Debug:        true,
-		AddCaller:    true,
-		CallerSkip:   2,
-		Rotate:       false,
-		RotateConfig: NewDefaultRotateConfig(),
+		Debug:      true,
+		Stdout:     true,
+		AddCaller:  false,
+		CallerSkip: 1,
 	}.Build()
 	FrameLogger = Config{
 		Debug:      true,
 		Stdout:     true,
-		AddCaller:  true,
-		CallerSkip: 2,
+		AddCaller:  false,
+		CallerSkip: 1,
 	}.Build()
 )
 
@@ -91,7 +90,6 @@ func Panicw(msg string, keysAndValues ...interface{}) {
 	DefaultLogger.Panicw(msg, keysAndValues...)
 }
 
-// DeSugar
 func Debugd(msg string, fields ...Field) {
 	DefaultLogger.Debugd(msg, fields...)
 }

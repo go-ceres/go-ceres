@@ -28,18 +28,18 @@ import (
 )
 
 // 日志拦截器
-func debugUnaryServerInterceptor(log logger.Logger,serverSlowThreshold int64) grpc.UnaryServerInterceptor {
+func debugUnaryServerInterceptor(log *logger.Logger, serverSlowThreshold int64) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler) (resp interface{}, err error) {
+		handler grpc.UnaryHandler) (resp interface{}, err error) {
 		// 开始时间
 		startTime := time.Now()
 		// 事件类型
 		event := "normal"
-		fields := make([]logger.Field,0)
+		fields := make([]logger.Field, 0)
 		duration := int64(0)
 		defer func() {
-			if serverSlowThreshold>0 {
-				duration = int64(time.Since(startTime))/1e6
+			if serverSlowThreshold > 0 {
+				duration = int64(time.Since(startTime)) / 1e6
 				if duration > serverSlowThreshold {
 					event = "overtime"
 				}
@@ -53,14 +53,14 @@ func debugUnaryServerInterceptor(log logger.Logger,serverSlowThreshold int64) gr
 				}
 				stack := make([]byte, 4096)
 				stack = stack[:runtime.Stack(stack, true)]
-				fields = append(fields, logger.FieldAny("stack",stack))
+				fields = append(fields, logger.FieldAny("stack", stack))
 				event = "recover"
 			}
 			fields = append(fields,
 				logger.FieldAny("grpc interceptor type", "unary"),
-				logger.FieldAny("method",info.FullMethod),
-				logger.FieldAny("duration",duration),
-				logger.FieldAny("event",event),
+				logger.FieldAny("method", info.FullMethod),
+				logger.FieldAny("duration", duration),
+				logger.FieldAny("event", event),
 			)
 			for key, val := range getPeer(ctx) {
 				fields = append(fields, logger.FieldAny(key, val))
@@ -68,28 +68,28 @@ func debugUnaryServerInterceptor(log logger.Logger,serverSlowThreshold int64) gr
 
 			if err != nil {
 				fields = append(fields, logger.FieldErr(err))
-				logger.Errord("access", fields...)
-			}else{
-				logger.Infod("access", fields...)
+				log.Errord("access", fields...)
+			} else {
+				log.Infod("access", fields...)
 			}
 		}()
-		return handler(ctx,req)
+		return handler(ctx, req)
 	}
 }
 
 // 日志拦截器
-func debugStreamServerInterceptor(log logger.Logger,serverSlowThreshold int64) grpc.StreamServerInterceptor {
+func debugStreamServerInterceptor(log *logger.Logger, serverSlowThreshold int64) grpc.StreamServerInterceptor {
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo,
-	handler grpc.StreamHandler) (err error) {
+		handler grpc.StreamHandler) (err error) {
 		// 开始时间
 		startTime := time.Now()
 		// 事件类型
 		event := "normal"
-		fields := make([]logger.Field,0)
+		fields := make([]logger.Field, 0)
 		duration := int64(0)
 		defer func() {
-			if serverSlowThreshold>0 {
-				duration = int64(time.Since(startTime))/1e6
+			if serverSlowThreshold > 0 {
+				duration = int64(time.Since(startTime)) / 1e6
 				if duration > serverSlowThreshold {
 					event = "overtime"
 				}
@@ -103,14 +103,14 @@ func debugStreamServerInterceptor(log logger.Logger,serverSlowThreshold int64) g
 				}
 				stack := make([]byte, 4096)
 				stack = stack[:runtime.Stack(stack, true)]
-				fields = append(fields, logger.FieldAny("stack",stack))
+				fields = append(fields, logger.FieldAny("stack", stack))
 				event = "recover"
 			}
 			fields = append(fields,
 				logger.FieldAny("grpc interceptor type", "stream"),
-				logger.FieldAny("method",info.FullMethod),
-				logger.FieldAny("duration",duration),
-				logger.FieldAny("event",event),
+				logger.FieldAny("method", info.FullMethod),
+				logger.FieldAny("duration", duration),
+				logger.FieldAny("event", event),
 			)
 			for key, val := range getPeer(ss.Context()) {
 				fields = append(fields, logger.FieldAny(key, val))
@@ -118,12 +118,12 @@ func debugStreamServerInterceptor(log logger.Logger,serverSlowThreshold int64) g
 
 			if err != nil {
 				fields = append(fields, logger.FieldErr(err))
-				logger.Errord("access", fields...)
-			}else{
-				logger.Infod("access", fields...)
+				log.Errord("access", fields...)
+			} else {
+				log.Infod("access", fields...)
 			}
 		}()
-		return handler(srv,ss)
+		return handler(srv, ss)
 	}
 }
 

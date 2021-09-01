@@ -18,10 +18,11 @@ package cmd
 import "github.com/go-ceres/cli/v2"
 
 type Options struct {
-	Name string
+	Name        string
+	Usage       string
 	Description string
 	Version     string
-	Flags		[]cli.Flag
+	Flags       []cli.Flag
 }
 
 type Option func(o *Options)
@@ -33,22 +34,29 @@ func Name(name string) Option {
 	}
 }
 
-// Name 设置应用介绍
-func Description(desc string) Option {
+// WithDescription 设置应用介绍
+func WithDescription(desc string) Option {
 	return func(o *Options) {
 		o.Description = desc
 	}
 }
 
-// Name 设置应用介绍
-func Version(v string) Option {
+// WithUsage 设置应用后面短简介
+func WithUsage(usa string) Option {
+	return func(o *Options) {
+		o.Usage = usa
+	}
+}
+
+// WithVersion 设置应用介绍
+func WithVersion(v string) Option {
 	return func(o *Options) {
 		o.Version = v
 	}
 }
 
-// Name 添加命令参数
-func Flags(flags []cli.Flag) Option {
+// WithFlags 添加命令参数
+func WithFlags(flags []cli.Flag) Option {
 	return func(o *Options) {
 		o.Flags = append(o.Flags, flags...)
 	}

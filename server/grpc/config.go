@@ -24,32 +24,36 @@ import (
 )
 
 type Config struct {
-	Debug				bool			// 是否开启调试
-	Network 			string			// net.listen的network类型
-	Host 				string			// 服务ip
-	Port 				int				// 服务端口
-	TLS					bool			// 是否使用tls连接
-	CertFile			string			// tls的cert文件路径
-	KeyFile				string			// tls的key文件路径
-	ServerSlowThreshold int64			// 服务器素速度阈值
-	serverOptions      []grpc.ServerOption
-	streamInterceptors []grpc.StreamServerInterceptor
-	unaryInterceptors  []grpc.UnaryServerInterceptor
-	logger				logger.Logger	// 日志组件
-	cmd					*cmd.Command	// 配置组件
+	Debug               bool   // 是否开启调试
+	Network             string // net.listen的network类型
+	Host                string // 服务ip
+	Port                int    // 服务端口
+	PlainTextAddress    string // 注册中心显示的地址
+	Version             string // 当前项目版本号
+	Name                string // 服务名称
+	TLS                 bool   // 是否使用tls连接
+	CertFile            string // tls的cert文件路径
+	KeyFile             string // tls的key文件路径
+	ServerSlowThreshold int64  // 服务器素速度阈值
+	serverOptions       []grpc.ServerOption
+	streamInterceptors  []grpc.StreamServerInterceptor
+	unaryInterceptors   []grpc.UnaryServerInterceptor
+	logger              *logger.Logger // 日志组件
 }
 
 // DefaultConfig 默认配置
 func DefaultConfig() *Config {
 	return &Config{
-		Debug: true,
-		Network: "tcp4",
-		Host: "0.0.0.0",
-		Port: 5201,
-		CertFile: "",
-		KeyFile: "",
+		Debug:               true,
+		Network:             "tcp4",
+		Host:                "0.0.0.0",
+		Port:                5201,
+		CertFile:            "",
+		KeyFile:             "",
 		ServerSlowThreshold: 500,
-		logger: logger.FrameLogger.With(logger.FieldMod("server.grpc")),
+		logger:              logger.FrameLogger.With(logger.FieldMod("server.grpc")),
+		Name:                cmd.DefaultCmd.App().Name,
+		Version:             cmd.DefaultCmd.App().Version,
 	}
 }
 
@@ -68,7 +72,7 @@ func RawConfig(key string) *Config {
 
 // ScanConfig 从config组件读取配置
 func ScanConfig(name string) *Config {
-	return RawConfig("ceres.server."+name)
+	return RawConfig("ceres.server." + name)
 }
 
 // WithServerOption 设置grpc服务参数
@@ -101,14 +105,8 @@ func (c *Config) WithUnaryInterceptor(opts ...grpc.UnaryServerInterceptor) *Conf
 }
 
 // WithLogger 重新设置日志组件
-func (c *Config) WithLogger(log logger.Logger) *Config {
+func (c *Config) WithLogger(log *logger.Logger) *Config {
 	c.logger = log
-	return c
-}
-
-// WithCommand 设置命令行组件
-func (c *Config) WithCommand(cmd *cmd.Command) *Config {
-	c.cmd = cmd
 	return c
 }
 
@@ -121,5 +119,3 @@ func (c *Config) Address() string {
 func (c *Config) Build() *grpcServer {
 	return newServer(c)
 }
-
-

@@ -23,8 +23,8 @@ import (
 )
 
 type grpcServer struct {
-	*grpc.Server
-	listen net.Listener
+	Server   *grpc.Server
+	listener net.Listener
 	*Config
 }
 
@@ -35,7 +35,6 @@ func newServer(c *Config) *grpcServer {
 		streamInterceptors = append(streamInterceptors, debugStreamServerInterceptor(c.logger, c.ServerSlowThreshold))
 	}
 	streamInterceptors = append(streamInterceptors, c.streamInterceptors...)
-
 
 	var unaryInterceptors = []grpc.UnaryServerInterceptor{}
 	if c.Debug {
@@ -57,14 +56,14 @@ func newServer(c *Config) *grpcServer {
 
 	return &grpcServer{
 		Server:   newServer,
-		listen: listener,
+		listener: listener,
 		Config:   c,
 	}
 }
 
 // Start 启动grpc服务
 func (s *grpcServer) Start() error {
-	return s.Server.Serve(s.listen)
+	return s.Server.Serve(s.listener)
 }
 
 // Stop 停止服务
@@ -75,5 +74,14 @@ func (s *grpcServer) Stop() error {
 
 // Info 服务信息
 func (s *grpcServer) Info() *server.ServiceInfo {
-	
+	address := s.listener.Addr().String()
+	if s.Config.PlainTextAddress != "" {
+		address = s.Config.PlainTextAddress
+	}
+	info := server.ApplyOptions(
+		server.WithAddress(address),
+		server.WithScheme("grpc"),
+		server.WithMetadata("app_host", address),
+	)
+	return info
 }
