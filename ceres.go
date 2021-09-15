@@ -33,10 +33,11 @@ type Engine struct {
 	initOnce     sync.Once
 	setupOnce    sync.Once
 	stopOnce     sync.Once
+	clear        func() // 程序结束后回调
 }
 
 // New 创建一个启动器
-func New(fns ...func() error) (*Engine, error) {
+func New(fns ...func() (func(), error)) (*Engine, error) {
 	eng := &Engine{}
 	if err := eng.MustSetup(fns...); err != nil {
 		return nil, err
@@ -87,7 +88,7 @@ func (eng *Engine) initCmd() error {
 }
 
 // MustSetup 必须初始化
-func (eng *Engine) MustSetup(fns ...func() error) error {
+func (eng *Engine) MustSetup(fns ...func() (func(), error)) error {
 	eng.initialize()
 	if err := eng.setup(); err != nil {
 		return err
@@ -186,12 +187,18 @@ func (eng *Engine) Stop() (err error) {
 }
 
 // parallelUntilError 并行方式运行，如果有错则返回错误
-func (eng *Engine) parallelUntilError(fns ...func() error) error {
+func (eng *Engine) parallelUntilError(fns ...func() (func(), error)) error {
 	group := new(errgroup.Group)
+	var clearArr []func()
 	for _, fn := range fns {
 		tfn := fn
 		group.Go(func() error {
-			return tfn()
+			clear, err := tfn()
+			if err != nil {
+				return err
+			}
+			clearArr = append(clearArr, clear)
+			return nil
 		})
 	}
 	return group.Wait()
