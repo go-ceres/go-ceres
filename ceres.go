@@ -181,6 +181,9 @@ func (eng *Engine) Stop() (err error) {
 		for _, fn := range eng.afterStops {
 			_ = fn()
 		}
+
+		eng.clear()
+
 		eng.cycle.Close()
 	})
 	return
@@ -200,6 +203,11 @@ func (eng *Engine) parallelUntilError(fns ...func() (func(), error)) error {
 			clearArr = append(clearArr, clear)
 			return nil
 		})
+	}
+	eng.clear = func() {
+		for _, f := range clearArr {
+			f()
+		}
 	}
 	return group.Wait()
 }
