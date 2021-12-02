@@ -72,7 +72,7 @@ func RawConfig(key string) *Config {
 
 // ScanConfig 从config组件读取配置
 func ScanConfig(name string) *Config {
-	return RawConfig("ceres.server." + name)
+	return RawConfig("ceres.server.grpc." + name)
 }
 
 // WithServerOption 设置grpc服务参数

@@ -22,17 +22,17 @@ import "encoding/json"
 // 错误码，低于10000则为系统错误
 
 type Error struct {
-	Code 		int 			`json:"code"`					// 错误码
-	Msg			string 			`json:"msg"`					// 错误信息
-	Data 		interface{} 	`json:"data"`					// 数据
-	Tid			string 			`json:"tid,omitempty"`			// 链路追踪id，可忽略
-	Aid			string 			`json:"aid,omitempty"`			// 应用id，可忽略
-	Mod			string 			`json:"mod,omitempty"`			// 出错模块，可忽略
+	Code int         `json:"code"`           // 错误码
+	Msg  string      `json:"msg"`            // 错误信息
+	Data interface{} `json:"data,omitempty"` // 数据
+	Tid  string      `json:"tid,omitempty"`  // 链路追踪id，可忽略
+	Aid  string      `json:"aid,omitempty"`  // 应用id，可忽略
+	Mod  string      `json:"mod,omitempty"`  // 出错模块，可忽略
 }
 
 // Error 实现error接口
 func (e *Error) Error() string {
-	return e.Msg
+	return e.String()
 }
 
 // String 打印所有信息
@@ -42,21 +42,21 @@ func (e *Error) String() string {
 }
 
 // New 创建一个基础错误信息
-func New(code int,msg string) *Error {
+func New(code int, msg string) *Error {
 	return &Error{
 		Code: code,
-		Msg: msg,
+		Msg:  msg,
 		Data: nil,
 	}
 }
 
 // FromError 从错误获取
 func FromError(err error) *Error {
-	e,ok:=err.(*Error)
+	e, ok := err.(*Error)
 	if ok {
 		return e
 	}
-	return New(99999,err.Error())
+	return New(99999, err.Error())
 }
 
 // WithMsg	设置错误信息
@@ -88,5 +88,3 @@ func (e *Error) WithMod(mod string) *Error {
 	e.Mod = mod
 	return e
 }
-
-

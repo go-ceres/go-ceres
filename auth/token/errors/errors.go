@@ -15,13 +15,16 @@
 
 package errors
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-)
+type Error struct {
+	message string
+}
+
+func NewError(msg string) *Error {
+	return &Error{
+		message: msg,
+	}
+}
+
+func (c *Error) Error() string {
+	return c.message
+}

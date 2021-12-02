@@ -43,7 +43,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		Block:         true,
 		ReadTimeout:   time.Second,
-		DialTimeout:   time.Second * 3,
+		DialTimeout:   time.Second * 10,
 		SlowThreshold: time.Duration(0),
 		Balancer:      roundrobin.Name,
 		Debug:         true,

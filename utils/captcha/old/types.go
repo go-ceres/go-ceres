@@ -13,15 +13,17 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package old
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-)
+// Point 随机生成的抠图位置
+type Point struct {
+	X int
+	Y int
+}
+
+// CutoutRet 抠图出来的结果
+type CutoutRet struct {
+	Point        *Point
+	BackgroudImg string
+	BlockImg     string
+}

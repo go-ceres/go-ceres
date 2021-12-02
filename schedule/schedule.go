@@ -27,9 +27,11 @@ type Schedule struct {
 
 // newSchedule 创建任务调度
 func newSchedule(c *Config) *Schedule {
+	opts := c.Opts
+	opts = append(opts, cron.WithLogger(c.log))
 	return &Schedule{
 		config: c,
-		Cron:   cron.New(cron.WithLogger(c.log)),
+		Cron:   cron.New(opts...),
 	}
 }
 
@@ -69,6 +71,10 @@ func (s *Schedule) List() []cron.Entry {
 // Run 阻塞启动
 func (s *Schedule) Run() {
 	s.Cron.Run()
+}
+
+func (s *Schedule) Stop() {
+	s.Cron.Stop()
 }
 
 // Start 启动

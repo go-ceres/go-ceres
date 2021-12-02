@@ -45,6 +45,10 @@ func init() {
 	hostName = name
 	// 应用启动时间
 	startTime = time.Now().Format("2006-01-02 15:04:05")
+
+	if version == "" {
+		version = "latest"
+	}
 	// 设置构建时间
 	SetBuildTime(buildTime)
 	goVersion = runtime.Version()

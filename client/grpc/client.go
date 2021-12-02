@@ -83,18 +83,20 @@ func (c *Client) Conn(service string, opts ...Option) (*grpc.ClientConn, error) 
 	// 调用的额外参数
 	var options = &Options{
 		DialOptions: []grpc.DialOption{},
-		Authority:   &resolver.Authority{},
+		Authority: &resolver.Authority{
+			Version: "latest",
+		},
 	}
 	var bytes []byte
 	if len(opts) > 0 {
 		for _, opt := range opts {
 			opt(options)
 		}
-		var err error
-		bytes, err = json.Marshal(options.Authority)
-		if err != nil {
-			return nil, err
-		}
+	}
+	var err error
+	bytes, err = json.Marshal(options.Authority)
+	if err != nil {
+		return nil, err
 	}
 	target.Authority = string(bytes)
 	// 设置调用target

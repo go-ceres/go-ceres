@@ -13,15 +13,23 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package elasticsearch
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
+import (
+	"github.com/go-ceres/go-ceres/logger"
+	"github.com/olivere/elastic"
 )
+
+type Client struct {
+	*elastic.Client // 客户端
+}
+
+func newClient(c *Config) *Client {
+	client, err := elastic.NewClient(c.options...)
+	if err != nil {
+		c.logger.Panicd("init client error", logger.FieldErr(err), logger.FieldAny("config", c))
+	}
+	return &Client{
+		Client: client,
+	}
+}

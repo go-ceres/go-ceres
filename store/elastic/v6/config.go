@@ -19,20 +19,25 @@ import (
 	"github.com/go-ceres/go-ceres/config"
 	"github.com/go-ceres/go-ceres/logger"
 	"github.com/olivere/elastic"
+	"net/http"
 )
 
 type Config struct {
-	Address  []string // es连接地址
-	Scheme   string   // http协议
-	Username string   // es用户名
-	Password string   // es密码
-	options  []elastic.ClientOptionFunc
-	logger   *logger.Logger // 日志组件
+	Address    []string     `json:"address"`  // es连接地址
+	Scheme     string       `json:"scheme"`   // http协议
+	Username   string       `json:"username"` // es用户名
+	Password   string       `json:"password"` // es密码
+	Sniff      bool         `json:"sniff"`    // 是否使用内部存活
+	httpClient *http.Client // http客户端
+	options    []elastic.ClientOptionFunc
+	logger     *logger.Logger // 日志组件
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		Address: []string{"127.0.0.1:7200"},
+		Address: []string{"http://127.0.0.1:9200"},
+		Scheme:  "http",
+		Sniff:   false,
 		logger:  logger.FrameLogger.With(logger.FieldMod("store.elastic")),
 	}
 }
@@ -52,6 +57,15 @@ func ScanConfig(name string) *Config {
 	return RawConfig("ceres.store.elastic." + name)
 }
 
+// WithTransport 单独设置http客户端的transport
+func (c *Config) WithTransport(transport *http.Transport) *Config {
+	if c.httpClient == nil {
+		c.httpClient = http.DefaultClient
+	}
+	c.httpClient.Transport = transport
+	return c
+}
+
 // Build 构建客户端
 func (c *Config) Build() *Client {
 	var options []elastic.ClientOptionFunc
@@ -64,7 +78,12 @@ func (c *Config) Build() *Client {
 	if c.Username != "" && c.Password != "" {
 		options = append(options, elastic.SetBasicAuth(c.Username, c.Password))
 	}
-	// 如果有tls
+	// 如果设置了transport
+	if c.httpClient != nil {
+		options = append(options, elastic.SetHttpClient(c.httpClient))
+	}
+	// 是否使用内部存活
+	options = append(options, elastic.SetSniff(c.Sniff))
 
 	c.options = options
 	return newClient(c)

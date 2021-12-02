@@ -30,13 +30,13 @@ type grpcServer struct {
 
 // NewServer 新建服务
 func newServer(c *Config) *grpcServer {
-	var streamInterceptors = []grpc.StreamServerInterceptor{}
+	var streamInterceptors []grpc.StreamServerInterceptor
 	if c.Debug {
 		streamInterceptors = append(streamInterceptors, debugStreamServerInterceptor(c.logger, c.ServerSlowThreshold))
 	}
 	streamInterceptors = append(streamInterceptors, c.streamInterceptors...)
 
-	var unaryInterceptors = []grpc.UnaryServerInterceptor{}
+	var unaryInterceptors []grpc.UnaryServerInterceptor
 	if c.Debug {
 		unaryInterceptors = append(unaryInterceptors, debugUnaryServerInterceptor(c.logger, c.ServerSlowThreshold))
 	}
@@ -75,9 +75,11 @@ func (s *grpcServer) Stop() error {
 // Info 服务信息
 func (s *grpcServer) Info() *server.ServiceInfo {
 	address := s.listener.Addr().String()
+	ip, port, _ := net.SplitHostPort(address)
 	if s.Config.PlainTextAddress != "" {
-		address = s.Config.PlainTextAddress
+		ip = s.Config.PlainTextAddress
 	}
+	address = ip + ":" + port
 	info := server.ApplyOptions(
 		server.WithAddress(address),
 		server.WithScheme("grpc"),

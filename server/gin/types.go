@@ -13,15 +13,8 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package gin
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-)
+import "github.com/gin-gonic/gin"
+
+type Context = gin.Context

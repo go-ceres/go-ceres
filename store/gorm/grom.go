@@ -45,9 +45,45 @@ func Open(dialect gorm.Dialector, c *Config) (*DB, error) {
 		sqlDb.SetConnMaxLifetime(c.ConnMaxLifetime)
 	}
 
+	//// 创建时间戳
+	//err2 := inner.Callback().Create().Replace("gorm:update_time_stamp", func(db *gorm.DB) {
+	//	if db.Statement.Schema != nil {
+	//		now := time.Now().Unix()
+	//		// 使用字段名或数据库名查找字段
+	//		field := db.Statement.Schema.LookUpField("CreateTime")
+	//		if field != nil {
+	//			// 将值设置给字段
+	//			newValueErr := field.Set(db.Statement.ReflectValue, now)
+	//			// 记录错误日志
+	//			logger.Errorf("gorm:update_time_stamp error: %v",newValueErr)
+	//		}
+	//	}
+	//})
+	//if err2 != nil {
+	//	return nil, err2
+	//}
+	//
+	//// 修改时间戳
+	//err3 := inner.Callback().Create().Replace("gorm:update_time_stamp", func(db *gorm.DB) {
+	//	if db.Statement.Schema != nil {
+	//		now := time.Now().Unix()
+	//		// 使用字段名或数据库名查找字段
+	//		field := db.Statement.Schema.LookUpField("UpdateTime")
+	//		if field != nil {
+	//			// 将值设置给字段
+	//			newValueErr := field.Set(db.Statement.ReflectValue, now)
+	//			// 记录错误日志
+	//			logger.Errorf("gorm:update_time_stamp error: %v",newValueErr)
+	//		}
+	//	}
+	//})
+	//if err3 != nil {
+	//	return nil, err3
+	//}
 	// 测试是否能连通
 	if err := sqlDb.Ping(); err != nil {
 		return nil, err
 	}
+
 	return inner, nil
 }

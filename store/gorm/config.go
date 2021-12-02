@@ -27,12 +27,12 @@ import (
 
 // Config 配置信息
 type Config struct {
-	Drive           string        // 驱动
-	DNS             string        // 连接字符串
-	Debug           bool          // 是否开启调试
-	MaxIdleConns    int           // 最大空闲连接数
-	MaxOpenConns    int           // 最大活动连接数
-	ConnMaxLifetime time.Duration // 连接的最大存活时间
+	Drive           string        `json:"drive"`             // 驱动
+	DNS             string        `json:"dns"`               // 连接字符串
+	Debug           bool          `json:"debug"`             // 是否开启调试
+	MaxIdleConns    int           `json:"max_idle_conns"`    // 最大空闲连接数
+	MaxOpenConns    int           `json:"max_open_conns"`    // 最大活动连接数
+	ConnMaxLifetime time.Duration `json:"conn_max_lifetime"` // 连接的最大存活时间
 
 	*GormConfig                // gorm初始化配置
 	*LogConfig                 // 日志配置

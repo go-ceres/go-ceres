@@ -15,21 +15,6 @@
 
 package elasticsearch
 
-import (
-	"github.com/go-ceres/go-ceres/logger"
-	"github.com/olivere/elastic/v7"
-)
-
-type Client struct {
-	*elastic.Client // 客户端
-}
-
-func newClient(c *Config) *Client {
-	client, err := elastic.NewClient(c.options...)
-	if err != nil {
-		c.logger.Panicd("init client error", logger.FieldErr(err), logger.FieldAny("config", c))
-	}
-	return &Client{
-		Client: client,
-	}
+type Index interface {
+	IndexName() string
 }

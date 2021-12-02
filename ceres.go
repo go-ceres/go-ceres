@@ -90,7 +90,8 @@ func (eng *Engine) initCmd() error {
 // MustSetup 必须初始化
 func (eng *Engine) MustSetup(fns ...func() (func(), error)) error {
 	eng.initialize()
-	if err := eng.setup(); err != nil {
+	err := eng.setup()
+	if err != nil {
 		return err
 	}
 	return eng.parallelUntilError(fns...)

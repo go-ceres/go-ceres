@@ -13,59 +13,50 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package schedule
+package redis
 
 import (
+	"github.com/go-ceres/go-ceres/cache"
+	"github.com/go-ceres/go-ceres/client/redis"
 	"github.com/go-ceres/go-ceres/config"
+	"github.com/go-ceres/go-ceres/errors"
 	"github.com/go-ceres/go-ceres/logger"
-	"github.com/robfig/cron/v3"
 )
 
+// Config 配置信息
 type Config struct {
-	Size int         `json:"size"` // 任务总数量
-	log  cron.Logger // 日志组件
-	Opts []cron.Option
+	Prefix string `json:"prefix"`
+	Type   string `json:"type"`
+	*redis.Config
+	logger logger.Interface
 }
 
-// DefaultConfig 默认配置
+// DefaultConfig 默认配置文件
 func DefaultConfig() *Config {
 	return &Config{
-		Size: 100,
-		log: &Logger{
-			Log: logger.FrameLogger,
-		},
+		Prefix: "cerescache",
+		Type:   "redis",
+		Config: redis.DefaultConfig(),
+		logger: logger.FrameLogger.With(logger.FieldMod(errors.ModCacheRedis)),
 	}
 }
 
-// RawConfig 完整key取配置
+// RawConfig ...
 func RawConfig(key string) *Config {
-	conf := DefaultConfig()
-	err := config.Get(key).Scan(conf)
+	c := DefaultConfig()
+	err := config.Get(key).Scan(c)
 	if err != nil {
-		panic(err)
+		c.logger.DPanicf("parse config", logger.FieldErr(err), logger.FieldAny("key", key), logger.FieldValue(c))
 	}
-	return conf
+	return c
 }
 
-// ScanConfig 名称取配置
+// ScanConfig 扫描配置文件
 func ScanConfig(name string) *Config {
-	return RawConfig("ceres.cron." + name)
+	return RawConfig("ceres.cache." + name)
 }
 
-// WithOptions 设置额外参数
-func (c *Config) WithOptions(ops ...cron.Option) *Config {
-	c.Opts = append(c.Opts, ops...)
-	return c
-}
-
-// WithLogger 设置日志组件
-func (c *Config) WithLogger(log cron.Logger) *Config {
-	c.log = log
-	return c
-}
-
-// Build 构建任务调度
-func (c *Config) Build() *Schedule {
-	s := newSchedule(c)
-	return s
+// Build 构建缓存组件
+func (c *Config) Build() cache.Cache {
+	return NewCacheRedis(c)
 }

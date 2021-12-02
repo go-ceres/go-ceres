@@ -13,15 +13,32 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package manager
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
+import (
+	"github.com/go-ceres/go-ceres/auth/token/stp"
+	"github.com/go-ceres/go-ceres/cache"
 )
+
+var defaultManager Manager
+
+type Manager struct {
+	Store cache.Cache   // 持久化接口
+	Stp   stp.Interface // 权限接口
+}
+
+func SetStorage(store cache.Cache) {
+	defaultManager.Store = store
+}
+
+func SetStp(stp stp.Interface) {
+	defaultManager.Stp = stp
+}
+
+func Storage() cache.Cache {
+	return defaultManager.Store
+}
+
+func Stp() stp.Interface {
+	return defaultManager.Stp
+}

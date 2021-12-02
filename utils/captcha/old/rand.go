@@ -13,15 +13,11 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package old
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
+import (
+	"math/rand"
+	"time"
 )
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))

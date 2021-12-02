@@ -351,7 +351,7 @@ func (e *etcdRegistry) ListService() ([]*registry.Service, error) {
 
 // Close 关闭连接
 func (e *etcdRegistry) Close() error {
-	panic("implement me")
+	return nil
 }
 
 // getSession 获取session

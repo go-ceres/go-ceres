@@ -13,15 +13,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package structure
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
+import (
+	"github.com/jinzhu/copier"
 )
+
+// Copy 结构体映射
+func Copy(toValue interface{}, fromValue interface{}) error {
+	return copier.Copy(toValue, fromValue)
+}
