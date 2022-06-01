@@ -13,18 +13,21 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package nacos
 
-type Error struct {
-	message string
-}
+import (
+	"fmt"
+	"net/url"
+	"testing"
+)
 
-func NewError(msg string) *Error {
-	return &Error{
-		message: msg,
+func TestParseUrl(t *testing.T) {
+	str := "http://console1.nacos.io:80/nacos"
+	parse, err := url.Parse(str)
+
+	if err != nil {
+		t.Fatal(err)
 	}
-}
+	fmt.Println("ip:", parse.Hostname(), "port", parse.Port())
 
-func (c *Error) Error() string {
-	return c.message
 }

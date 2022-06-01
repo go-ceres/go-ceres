@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,24 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package token
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-	ModAuthToken    = "auth.token"
-)
+import "github.com/go-ceres/go-ceres/logger"
+
+type Logger interface {
+	Debug(args ...interface{})
+	Info(args ...interface{})
+	Warn(args ...interface{})
+	Error(args ...interface{})
+	DPanic(args ...interface{})
+	Panic(args ...interface{})
+
+	Panicd(message string, fields ...logger.Field)
+
+	Debugf(template string, args ...interface{})
+	Infof(template string, args ...interface{})
+	Warnf(template string, args ...interface{})
+	Errorf(template string, args ...interface{})
+	DPanicf(template string, args ...interface{})
+	Panicf(template string, args ...interface{})
+}

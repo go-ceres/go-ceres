@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,25 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package token
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-	ModAuthToken    = "auth.token"
-)
+import "reflect"
+
+func InterfaceIsNil(i interface{}) bool {
+	ret := i == nil
+
+	if !ret { //需要进一步做判断
+		vi := reflect.ValueOf(i)
+		kind := reflect.ValueOf(i).Kind()
+		if kind == reflect.Slice ||
+			kind == reflect.Map ||
+			kind == reflect.Chan ||
+			kind == reflect.Interface ||
+			kind == reflect.Func ||
+			kind == reflect.Ptr {
+			return vi.IsNil()
+		}
+	}
+
+	return ret
+}

@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,32 +13,27 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package manager
+package token
 
-import (
-	"github.com/go-ceres/go-ceres/auth/token/stp"
-	"github.com/go-ceres/go-ceres/cache"
-)
-
-var defaultManager Manager
-
-type Manager struct {
-	Store cache.Cache   // 持久化接口
-	Stp   stp.Interface // 权限接口
+type defaultPermission struct {
+	router *Router
 }
 
-func SetStorage(store cache.Cache) {
-	defaultManager.Store = store
+func (d *defaultPermission) GetRouterInfoWithPath(path string, unescape bool) (*RouterInfo, error) {
+	return d.router.GetRouter(path, unescape), nil
 }
 
-func SetStp(stp stp.Interface) {
-	defaultManager.Stp = stp
+func (d *defaultPermission) GetPermissionSlice(loginId string, logicType string) ([]string, error) {
+	return []string{}, nil
 }
 
-func Storage() cache.Cache {
-	return defaultManager.Store
+func (d *defaultPermission) GetRoleListSlice(loginId string, logicType string) ([]string, error) {
+	return []string{}, nil
 }
 
-func Stp() stp.Interface {
-	return defaultManager.Stp
+// NewDefaultPermission 创建一个默认权限
+func NewDefaultPermission() Permission {
+	return &defaultPermission{
+		router: NewRouter(),
+	}
 }

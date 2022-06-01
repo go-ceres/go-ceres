@@ -41,6 +41,11 @@ func Load(sources Source) error {
 	return DefaultConfig.LoadSource(sources)
 }
 
+// LoadContent 直接加载byte数据
+func LoadContent(in []byte, format string) error {
+	return DefaultConfig.Load(in, format)
+}
+
 // Watch 开启配置文件监听
 func Watch() {
 	DefaultConfig.Watch()

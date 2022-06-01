@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,9 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package stp
+package token
 
-type Interface interface {
+// tokenAction token相关操作
+type tokenAction interface {
+	createToken(loginId string, logicType string, device string) string
 }

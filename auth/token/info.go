@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +13,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package entity
+package token
 
-type TokenInfo struct {
+// Info token详细信息
+type Info struct {
 	TokenName            string `json:"token_name"`             // token名称
 	TokenValue           string `json:"token_value"`            // token值
 	IsLogin              bool   `json:"is_login"`               // 是否登录
-	LoginType            string `json:"login_type"`             // 逻辑处理类型
+	LogicType            string `json:"logic_type"`             // 逻辑类型
 	TokenTimeout         int64  `json:"token_timeout"`          // 当前token剩余时间
 	SessionTimeout       int64  `json:"session_timeout"`        // 当前用户session有效时间
 	TokenSessionTimeout  int64  `json:"token_session_timeout"`  // 当前token的有效时间

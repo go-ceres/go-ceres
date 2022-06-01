@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,41 +17,38 @@ package token
 
 import (
 	"github.com/go-ceres/go-ceres/config"
+	"github.com/go-ceres/go-ceres/errors"
 	"github.com/go-ceres/go-ceres/logger"
 )
 
-const (
-	TokenStyleUuid        = "uuid"        // uuid样式
-	TokenStyleSimpleUuid  = "simple-uuid" // uuid不带下划线
-	TOKEN_STYLE_RANDOM_32 = "random-32"   // 随机32字符串
-)
-
+// Config 配置信息
 type Config struct {
-	TokenName       string         `json:"token_name" yaml:"token_name" toml:"token_name"`                   // token的名称，同时提交的token名称也是如此
-	Timeout         int64          `json:"timeout" yaml:"timeout" toml:"timeout"`                            // usertoken的过期时间
-	ActivityTimeout int64          `json:"activity_timeout" yaml:"activity_timeout" toml:"activity_timeout"` // 临时过期时间（适用场景为，多少时间后就不允许操作）
-	IsConcurrent    bool           `json:"is_concurrent" yaml:"is_concurrent" toml:"is_concurrent"`          // 是否支持同时在线（为false时会挤掉旧登录）
-	IsShare         bool           `json:"is_share" yaml:"is_share" toml:"is_share"`                         // 是否共享token，
-	TokenStyle      string         `json:"token_style" yaml:"token_style" toml:"token_style"`                // token样式
-	AutoRenew       bool           `json:"auto_renew" yaml:"auto_renew" toml:"auto_renew"`                   // 自动续签
-	TokenPrefix     string         `json:"token_prefix" yaml:"token_prefix" toml:"token_prefix"`             // token前缀
-	IsLog           bool           `json:"is_log" yaml:"is_log" toml:"is_log"`                               // 是否打印日志
-	CheckLogin      bool           `json:"check_login" yaml:"check_login" toml:"check_login"`                // 获取tokensession时是否检查登录，
-	logger          *logger.Logger // 日志组件
+	TokenName       string     `json:"token_name" yaml:"TokenName" toml:"token_name"`                   // token名称，提交的时候按照此名称获取token数据
+	Timeout         int64      `json:"timeout" yaml:"Timeout" toml:"timeout"`                           // userToken 过期时间
+	ActivityTimeout int64      `json:"activity_timeout" yaml:"ActivityTimeout" toml:"activity_timeout"` // 临时过期时间，用于（超过多少时间不能再操作）
+	IsConcurrent    bool       `json:"is_concurrent" yaml:"IsConcurrent" toml:"is_concurrent"`          // 是否支持多账号登录
+	IsShare         bool       `json:"is_share" yaml:"IsShare" toml:"is_share"`                         // 是否共享token
+	TokenStyle      TokenStyle `json:"token_style" yaml:"TokenStyle" toml:"token_style"`                // token的样式
+	AutoRenew       bool       `json:"auto_renew" yaml:"AutoRenew"  toml:"auto_renew"`                  // 自动续签
+	TokenPrefix     string     `json:"token_prefix" yaml:"TokenPrefix" toml:"token_prefix"`             // token前缀
+	IsLog           bool       `json:"is_log" yaml:"IsLog" toml:"is_log"`                               // 是否打印日志
+	CheckLogin      bool       `json:"check_login" yaml:"CheckLogin" toml:"check_login"`                // 检查是否登录
+	logger          Logger     // 日志组件
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		TokenName:       "cerestoken",
+		TokenName:       "ceres-token",
 		Timeout:         2592000,
-		ActivityTimeout: -1,
+		ActivityTimeout: 7200,
 		IsConcurrent:    true,
 		IsShare:         true,
-		TokenStyle:      TokenStyleUuid,
+		TokenStyle:      TOKEN_STYLE_UUID,
 		AutoRenew:       true,
-		TokenPrefix:     "",
+		TokenPrefix:     "Bearer",
 		IsLog:           true,
 		CheckLogin:      true,
+		logger:          logger.FrameLogger.With(logger.FieldMod(errors.ModAuthToken)),
 	}
 }
 
@@ -77,6 +74,6 @@ func (c *Config) WithLogger(log *logger.Logger) *Config {
 }
 
 // Build 构建token
-func (c *Config) Build(loginType string) *Token {
-	return NewToken(c, loginType)
+func (c *Config) Build(loginType string) *Logic {
+	return NewLogic(loginType, c)
 }

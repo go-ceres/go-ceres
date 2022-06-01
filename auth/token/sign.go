@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,15 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package token
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-	ModAuthToken    = "auth.token"
-)
+// Sign 签名
+type sign struct {
+	Value  string `json:"value"`  // Token值
+	Device string `json:"device"` // 设备
+}
+
+// String 获取签名字符串
+func (s *sign) String() string {
+	return "TokenSign [value=" + s.Value + ", device=" + s.Device + "]"
+}

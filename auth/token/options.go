@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,49 +15,31 @@
 
 package token
 
-import "github.com/go-ceres/go-ceres/auth/token/entity"
-
 type loginOptions struct {
-	device  string // 设备标识
-	timeout int64  // 当前此次登录的过期时间
-}
-
-func (l *loginOptions) Device() string {
-	return l.device
-}
-
-func (l *loginOptions) SetDevice(device string) {
-	l.device = device
-}
-
-func (l *loginOptions) Timeout() int64 {
-	return l.timeout
-}
-
-func (l *loginOptions) SetTimeout(timeout int64) {
-	l.timeout = timeout
+	device  string // 登录的客户端设备标识
+	timeout int64  // 指定当前登录token的有效时间（如果没有指定则使用全局配置）
 }
 
 type LoginOption func(o *loginOptions)
 
 // DefaultOption 默认的登录额外参数
-func DefaultOption(timeout int64) *loginOptions {
+func defaultLoginOptions(c *Config) *loginOptions {
 	opts := &loginOptions{
-		timeout: timeout,
-		device:  entity.DefaultLoginDevice,
+		timeout: c.Timeout,
+		device:  defaultLoginDevice,
 	}
 	return opts
 }
 
-// Device 客户端
-func Device(device string) LoginOption {
+// LoginDevice 客户端
+func LoginDevice(device string) LoginOption {
 	return func(o *loginOptions) {
 		o.device = device
 	}
 }
 
-// Timeout 当前此次登录的过期时间
-func Timeout(timeout int64) LoginOption {
+// LoginTimeout 当前此次登录的过期时间
+func LoginTimeout(timeout int64) LoginOption {
 	return func(o *loginOptions) {
 		o.timeout = timeout
 	}

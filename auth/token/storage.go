@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,19 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package cache
+package token
 
-type Cache interface {
+type Storage interface {
 	// Has 查询是否包含缓存
 	Has(key string) bool
-	// Get 获取缓存
-	Get(key string, def ...string) string
-	// Set 写入缓存
-	Set(key string, value string, timeout int64) bool
 	// SetObject 设置对象
 	SetObject(key string, value interface{}, timeout int64) bool
 	// GetObject 获取obj
 	GetObject(key string, obj interface{}) bool
+	// Get 获取缓存
+	Get(key string, def ...string) string
+	// Set 写入缓存
+	Set(key string, value string, timeout int64) bool
 	// Update 修改缓存，不修改时间
 	Update(key string, value string)
 	// UpdateObject 修改持久化数据

@@ -13,16 +13,22 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package nacos
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-	ModAuthToken    = "auth.token"
+import (
+	"github.com/nacos-group/nacos-sdk-go/clients"
+	"github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/vo"
 )
+
+type Config struct {
+	Urls []string `json:"urls"` // nacos 连接地址
+
+}
+
+func (c *Config) Build() {
+	clients.NewNamingClient(vo.NacosClientParam{
+		ClientConfig:  &constant.ClientConfig{},
+		ServerConfigs: []constant.ServerConfig{},
+	})
+}

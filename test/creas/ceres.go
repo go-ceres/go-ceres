@@ -13,18 +13,15 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package entity
+package creas
 
-const (
-	DefaultLoginDevice = "device_default" // 默认设备
-)
+var g = struct {
+	context CeresConext
+}{}
 
-// TokenSign 签名
-type TokenSign struct {
-	Value  string `json:"value"`
-	Divice string `json:"divice"`
+type CeresConext struct {
 }
 
-func (s *TokenSign) String() string {
-	return "TokenSign [value=" + s.Value + ", device=" + s.Divice + "]"
+func LoadClass() {
+
 }

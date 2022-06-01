@@ -43,22 +43,31 @@ func TestXuliehua(t *testing.T) {
 }
 
 func TestSetCreateToken(t *testing.T) {
-	cache := redis.DefaultConfig().Build()
-	tokens := token.ScanConfig("ceshi").Build("user").WithStore(cache)
-	login, err := tokens.Login("123456")
+	storage := redis.DefaultConfig().Build()
+	tokenManager := token.ScanConfig("ceshi").Build("user").SetStorage(storage)
+	login, err := tokenManager.Login("123456")
 	if err != nil {
 		return
 	}
 	fmt.Println(login)
-	fmt.Println(tokens.IsLogin("105cdc2e-79bf-4fbb-bf97-9b9959a80296"))
+	fmt.Println(tokenManager.IsLogin(login))
 }
 
 func TestCheckLogin(t *testing.T) {
-	cache := redis.DefaultConfig().Build()
-	tokens := token.ScanConfig("ceshi").Build("user").WithStore(cache)
-	marshal, err := json.Marshal(tokens.GetTokenInfo("f7656be3-a24a-440d-a5c7-e277b95527d1"))
+	storage := redis.DefaultConfig().Build()
+	tokenManager := token.ScanConfig("ceshi").Build("user").SetStorage(storage)
+	marshal, err := json.Marshal(tokenManager.GetTokenInfo("a22a435b-0b1a-4321-8426-6ce0ea8ab40f"))
 	if err != nil {
 		return
 	}
 	fmt.Println(string(marshal))
+}
+
+func TestGetLoginId(t *testing.T) {
+	storage := redis.DefaultConfig().Build()
+	tokenManager := token.ScanConfig("ceshi").Build("user").SetStorage(storage)
+	id := tokenManager.GetTokenInfo("a22a435b-0b1a-4321-8426-6ce0ea8ab40f")
+	tokenManager.CheckLogin("a22a435b-0b1a-4321-8426-6ce0ea8ab40f")
+	data, _ := json.Marshal(id)
+	fmt.Println(string(data))
 }

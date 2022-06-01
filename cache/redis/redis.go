@@ -16,6 +16,7 @@
 package redis
 
 import (
+	"encoding/json"
 	"github.com/go-ceres/go-ceres/client/redis"
 	"time"
 )
@@ -72,6 +73,27 @@ func (c *CacheRedis) Set(key string, value string, timeout int64) bool {
 	return c.client.Set(key, value, time.Second*time.Duration(timeout))
 }
 
+// SetObject 设置对象
+func (c *CacheRedis) SetObject(key string, value interface{}, timeout int64) bool {
+	key = c.getSaveKey(key)
+	marshal, err := json.Marshal(value)
+	if err != nil {
+		return false
+	}
+	return c.client.Set(key, marshal, time.Second*time.Duration(timeout))
+}
+
+// GetObject 获取obj
+func (c *CacheRedis) GetObject(key string, obj interface{}) bool {
+	key = c.getSaveKey(key)
+	str := c.client.Get(key)
+	err := json.Unmarshal([]byte(str), obj)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 // Update 修改数据,并且不修改过期时间
 func (c *CacheRedis) Update(key string, value string) {
 	expire, err := c.client.TTL(c.getSaveKey(key))
@@ -79,6 +101,21 @@ func (c *CacheRedis) Update(key string, value string) {
 		return
 	}
 	c.Set(key, value, expire)
+}
+
+// UpdateObject 修改持久化数据
+func (c *CacheRedis) UpdateObject(key string, value interface{}) bool {
+	expire, err := c.client.TTL(c.getSaveKey(key))
+	if err != nil {
+		return false
+	}
+	return c.SetObject(key, value, expire)
+}
+
+// UpdateObjectTTl 修改持久化时间
+func (c *CacheRedis) UpdateObjectTTl(key string, timeout int64) {
+	key = c.getSaveKey(key)
+	_, _ = c.client.Expire(key, time.Duration(timeout)*time.Second)
 }
 
 // Del 删除缓存

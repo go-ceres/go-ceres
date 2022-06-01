@@ -141,7 +141,7 @@ func (c *config) notifyChange() {
 	}
 }
 
-// 创建一个新的config管理器
+// NewConfig 创建一个新的config管理器
 func NewConfig() Config {
 	conf := config{
 		store: NewJSONValues([]byte("")),

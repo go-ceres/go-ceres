@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package token
 
-const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-	ModAuthToken    = "auth.token"
-)
+type Permission interface {
+	// GetRouterInfoWithPath 获取指定路径的路由信息
+	GetRouterInfoWithPath(path string, unescape bool) (*RouterInfo, error)
+	// GetPermissionSlice 获取指定账号指定设备的权限列表
+	GetPermissionSlice(loginId string, logicType string) ([]string, error)
+	// GetRoleListSlice 获取指定
+	GetRoleListSlice(loginId string, logicType string) ([]string, error)
+}

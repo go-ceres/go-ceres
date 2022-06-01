@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package errors
+package token
+
+// TokenStyle token样式
+type TokenStyle string
+
+// NoLoginErrorValue 没有登录的错误
+type NoLoginErrorValue int8
 
 const (
-	ModApp          = "app"
-	ModLogger       = "logger"
-	ModClientEtcd   = "client.etcd"
-	ModRegistryEtcd = "registry.etcd"
-	ModClientGrpc   = "client.grpc"
-	ModStoreGorm    = "store.gorm"
-	ModClientRedis  = "client.redis"
-	ModCacheRedis   = "cache.redis"
-	ModAuthToken    = "auth.token"
+	TOKEN_STYLE_UUID        TokenStyle = "uuid"        // uuid样式
+	TOKEN_STYLE_SIMPLE_UUID TokenStyle = "simple-uuid" // uuid不带下划线
+	TOKEN_STYLE_RANDOM_32   TokenStyle = "random-32"   // 随机32位字符串
+	TOKEN_STYLE_RANDOM_64   TokenStyle = "random-64"   // 随机64位字符串
+	TOKEN_STYLE_JWT         TokenStyle = "jwt"         // jwt格式
+)
+
+const (
+	defaultLoginDevice = "device_default" // 默认设备
+)
+
+const (
+	disableValue = "disable"
 )

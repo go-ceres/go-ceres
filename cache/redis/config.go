@@ -34,7 +34,7 @@ type Config struct {
 // DefaultConfig 默认配置文件
 func DefaultConfig() *Config {
 	return &Config{
-		Prefix: "cerescache",
+		Prefix: "ceres:cache",
 		Type:   "redis",
 		Config: redis.DefaultConfig(),
 		logger: logger.FrameLogger.With(logger.FieldMod(errors.ModCacheRedis)),

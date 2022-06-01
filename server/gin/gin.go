@@ -125,21 +125,27 @@ func (s *Server) RegisterService(sd *ServiceDesc, ss interface{}) {
 
 // register 根据描述文件注册路由
 func (s *Server) register(sd *ServiceDesc, ss interface{}) {
+
 	for _, router := range sd.Routers {
-		s.Engine.Handle(router.Method, router.Path, func(ctx *gin.Context) {
-			df := func(v interface{}) error {
-				return ctx.ShouldBindHeader(v)
-			}
-			resp, err := router.Handler(ss, ctx, df)
-			if err != nil {
-				if e, ok := err.(*errors.Error); ok {
-					ctx.String(e.Code, e.Msg)
-					return
-				}
-				ctx.String(500, err.Error())
+		s.Engine.Handle(router.Method, router.Path, s.buildHandler(ss, router.Handler))
+	}
+}
+
+func (s *Server) buildHandler(ss interface{}, handler methodHandler) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		handler := handler
+		df := func(v interface{}) error {
+			return ctx.ShouldBind(v)
+		}
+		resp, err := handler(ss, ctx, df)
+		if err != nil {
+			if e, ok := err.(*errors.Error); ok {
+				ctx.String(e.Code, e.Msg)
 				return
 			}
-			ctx.JSON(200, resp)
-		})
+			ctx.String(500, err.Error())
+			return
+		}
+		ctx.JSON(200, resp)
 	}
 }
