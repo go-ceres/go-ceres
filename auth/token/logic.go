@@ -419,7 +419,15 @@ func (l *Logic) GetDisableTime(loginId string) int64 {
 //形参:
 //tokenValue – token值
 func (l *Logic) DeleteTokenSession(tokenValue string) {
-	l.GetStorage().Del(l.splicingTokenValueKey(tokenValue))
+	l.GetStorage().Del(l.splicingTokenSessionKey(tokenValue))
+}
+
+// GetTokenSessionByToken 获取指定token的session
+// 形参
+// tokenValue - 指定的token
+// isCreate - 是否创建
+func (l *Logic) GetTokenSessionByToken(tokenValue string, isCreate bool) *session {
+	return l.GetSessionBySessionId(l.splicingTokenSessionKey(tokenValue), isCreate)
 }
 
 // ================== user-session相关 =================
@@ -709,6 +717,11 @@ func (l *Logic) splicingLastActivityTimeKey(tokenValue string) string {
 // splicingTokenValueKey 拼接tokenValueKey
 func (l *Logic) splicingTokenValueKey(tokenValue string) string {
 	return l.config.TokenName + ":" + l.logicType + ":token:" + tokenValue
+}
+
+// splicingTokenSessionKey 拼接tokenSessionKey
+func (l *Logic) splicingTokenSessionKey(tokenValue string) string {
+	return l.GetTokenName() + ":" + l.logicType + ":token-session:" + tokenValue
 }
 
 // splicingSwitchKey 凭借切换用户key
