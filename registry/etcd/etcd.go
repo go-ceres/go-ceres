@@ -18,7 +18,7 @@ package etcd
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-ceres/go-ceres/client/etcdv3"
+	"github.com/go-ceres/go-ceres/client/etcd"
 	"github.com/go-ceres/go-ceres/errors"
 	"github.com/go-ceres/go-ceres/logger"
 	"github.com/go-ceres/go-ceres/registry"
@@ -30,9 +30,9 @@ import (
 )
 
 type etcdRegistry struct {
-	client   *etcdv3.Client // 客户端
-	rw       *sync.RWMutex  // 读写锁
-	cache    sync.Map       // 注册缓存信息
+	client   *etcd.Client  // 客户端
+	rw       *sync.RWMutex // 读写锁
+	cache    sync.Map      // 注册缓存信息
 	sessions map[string]*concurrency.Session
 	*Config
 }
@@ -45,7 +45,7 @@ type registerStore struct {
 
 // newRegistry 新建etcd注册中心
 func newRegistry(c *Config) *etcdRegistry {
-	var client *etcdv3.Client
+	var client *etcd.Client
 	if c.etcdClient != nil {
 		client = c.etcdClient
 	} else {

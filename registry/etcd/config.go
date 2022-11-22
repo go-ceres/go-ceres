@@ -16,7 +16,7 @@
 package etcd
 
 import (
-	"github.com/go-ceres/go-ceres/client/etcdv3"
+	"github.com/go-ceres/go-ceres/client/etcd"
 	"github.com/go-ceres/go-ceres/config"
 	"github.com/go-ceres/go-ceres/errors"
 	"github.com/go-ceres/go-ceres/logger"
@@ -26,20 +26,20 @@ import (
 
 // Config 配置信息
 type Config struct {
-	*etcdv3.Config
+	*etcd.Config
 	Prefix        string        `json:"prefix"`       // 前缀
 	Namespace     string        `json:"namespace"`    // 服务空间
 	ReadTimeout   time.Duration `json:"read_timeout"` // 请求超时时间
 	ServiceTTL    time.Duration `json:"service_ttl"`  // 服务续约时间间隔
 	EtcdConfigKey string        `json:"etcd_key"`     // etcd配置键
-	etcdClient    *etcdv3.Client
+	etcdClient    *etcd.Client
 	log           *logger.Logger
 }
 
 // DefaultConfig 默认配置
 func DefaultConfig() *Config {
 	return &Config{
-		Config:      etcdv3.DefaultConfig(),
+		Config:      etcd.DefaultConfig(),
 		Prefix:      "/ceres/registry/",
 		Namespace:   "go-ceres.com",
 		ReadTimeout: time.Second * 3,
@@ -70,7 +70,7 @@ func (c *Config) WithLogger(log *logger.Logger) *Config {
 }
 
 // WithClient 单独设置etcd客户端
-func (c *Config) WithClient(client *etcdv3.Client) *Config {
+func (c *Config) WithClient(client *etcd.Client) *Config {
 	c.etcdClient = client
 	return c
 }
@@ -78,7 +78,7 @@ func (c *Config) WithClient(client *etcdv3.Client) *Config {
 // Build 构建etcd注册中心
 func (c *Config) Build() registry.Registry {
 	if len(c.EtcdConfigKey) > 0 {
-		c.Config = etcdv3.RawConfig(c.EtcdConfigKey)
+		c.Config = etcd.RawConfig(c.EtcdConfigKey)
 	}
 	return newRegistry(c)
 }

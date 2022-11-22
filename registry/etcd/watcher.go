@@ -17,7 +17,7 @@ package etcd
 
 import (
 	"context"
-	"github.com/go-ceres/go-ceres/client/etcdv3"
+	"github.com/go-ceres/go-ceres/client/etcd"
 	"github.com/go-ceres/go-ceres/errors"
 	"github.com/go-ceres/go-ceres/registry"
 	"go.etcd.io/etcd/client/v3"
@@ -29,7 +29,7 @@ import (
 type etcdWatcher struct {
 	stop      chan bool          // 停止监控通道
 	watchChan clientv3.WatchChan // etcd的监控通道
-	client    *etcdv3.Client     // etcd客户端
+	client    *etcd.Client       // etcd客户端
 }
 
 // NewWatch 创建服务观察者
