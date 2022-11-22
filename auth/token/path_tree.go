@@ -17,7 +17,7 @@ package token
 
 import (
 	"bytes"
-	"github.com/go-ceres/go-ceres/utils/bytesconv"
+	"github.com/go-ceres/go-ceres/utils/bytesconvx"
 	"net/url"
 	"strings"
 	"unicode"
@@ -103,14 +103,14 @@ func (n *node) addChild(child *node) {
 
 func countParams(path string) uint16 {
 	var n uint16
-	s := bytesconv.StringToBytes(path)
+	s := bytesconvx.StringToBytes(path)
 	n += uint16(bytes.Count(s, strColon))
 	n += uint16(bytes.Count(s, strStar))
 	return n
 }
 
 func countSections(path string) uint16 {
-	s := bytesconv.StringToBytes(path)
+	s := bytesconvx.StringToBytes(path)
 	return uint16(bytes.Count(s, strSlash))
 }
 
@@ -194,7 +194,7 @@ walk:
 
 			n.children = []*node{&child}
 			// []byte for proper unicode char conversion, see #65
-			n.indices = bytesconv.BytesToString([]byte{n.path[i]})
+			n.indices = bytesconvx.BytesToString([]byte{n.path[i]})
 			n.path = path[:i]
 			n.permissions = nil
 			n.wildChild = false
@@ -227,7 +227,7 @@ walk:
 			// Otherwise insert it
 			if c != ':' && c != '*' && n.nType != catchAll {
 				// []byte for proper unicode char conversion, see #65
-				n.indices += bytesconv.BytesToString([]byte{c})
+				n.indices += bytesconvx.BytesToString([]byte{c})
 				child := &node{
 					fullPath: fullPath,
 				}

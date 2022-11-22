@@ -9,8 +9,8 @@ import (
 	"github.com/go-ceres/go-ceres/registry"
 	"github.com/go-ceres/go-ceres/schedule"
 	"github.com/go-ceres/go-ceres/server"
-	"github.com/go-ceres/go-ceres/utils/cycle"
-	"github.com/go-ceres/go-ceres/utils/signals"
+	"github.com/go-ceres/go-ceres/utils/cyclex"
+	"github.com/go-ceres/go-ceres/utils/signalsx"
 	"go.uber.org/automaxprocs/maxprocs"
 	"golang.org/x/sync/errgroup"
 	"runtime"
@@ -22,7 +22,7 @@ type Engine struct {
 	isSetup      bool               // 是否设置
 	init         []func() error     // 启动项方法
 	rw           *sync.RWMutex      // 读写锁
-	cycle        *cycle.Cycle       // 异步运行管理
+	cycle        *cyclex.Cycle      // 异步运行管理
 	servers      []server.Server    // 服务
 	schedule     *schedule.Schedule // 定时任务管理
 	registry     registry.Registry  // 注册中心
@@ -50,7 +50,7 @@ func New(fns ...func() (func(), error)) (*Engine, error) {
 func (eng *Engine) initialize() {
 	eng.initOnce.Do(func() {
 		eng.rw = &sync.RWMutex{}
-		eng.cycle = cycle.NewCycle()
+		eng.cycle = cyclex.NewCycle()
 		eng.servers = make([]server.Server, 0)
 		eng.beforeStarts = make([]func() error, 0)
 		eng.beforeStops = make([]func() error, 0)
@@ -279,7 +279,7 @@ func (eng *Engine) initCron() error {
 // waitSignals 等待退出信号
 func (eng *Engine) waitSignals() {
 	eng.logger.Infod("init listen signal", logger.FieldMod(errors.ModApp))
-	signals.Shutdown(func(grace bool) { //when get shutdown signal
+	signalsx.Shutdown(func(grace bool) { //when get shutdown signal
 		//todo: support timeout
 		if grace {
 			_ = eng.GracefulStop(context.TODO())

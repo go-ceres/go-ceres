@@ -16,7 +16,7 @@
 package token
 
 import (
-	s2 "github.com/go-ceres/go-ceres/utils/strings"
+	"github.com/go-ceres/go-ceres/utils/stringsx"
 	"github.com/google/uuid"
 	"strings"
 )
@@ -34,9 +34,9 @@ func (d *defaultAction) createToken(loginId string, logicType string, device str
 	case TOKEN_STYLE_SIMPLE_UUID:
 		return strings.ReplaceAll(uuid.New().String(), "_", "")
 	case TOKEN_STYLE_RANDOM_32:
-		return s2.RandStr(32)
+		return stringsx.RandStr(32)
 	case TOKEN_STYLE_RANDOM_64:
-		return s2.RandStr(64)
+		return stringsx.RandStr(64)
 	case TOKEN_STYLE_JWT:
 		token, _ := makeToken(loginId, logicType, device)
 		return token
@@ -45,7 +45,7 @@ func (d *defaultAction) createToken(loginId string, logicType string, device str
 	}
 }
 
-func newDefaultAction(logic *Logic) tokenAction {
+func newDefaultAction(logic *Logic) TokenAction {
 	return &defaultAction{
 		logic: logic,
 	}

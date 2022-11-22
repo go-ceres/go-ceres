@@ -40,7 +40,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		TokenName:       "ceres-token",
 		Timeout:         2592000,
-		ActivityTimeout: 7200,
+		ActivityTimeout: -1,
 		IsConcurrent:    true,
 		IsShare:         true,
 		TokenStyle:      TOKEN_STYLE_UUID,

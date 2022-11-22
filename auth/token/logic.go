@@ -16,7 +16,7 @@
 package token
 
 import (
-	"github.com/go-ceres/go-ceres/utils/object"
+	"github.com/go-ceres/go-ceres/utils/objectx"
 	"strconv"
 	"time"
 )
@@ -26,7 +26,7 @@ type Logic struct {
 	config      *Config     // 配置信息
 	permission  Permission  //权限管理
 	storage     Storage     // 缓存
-	tokenAction tokenAction // token相关操作
+	tokenAction TokenAction // token相关操作
 	listener    Listener    // 监听器
 }
 
@@ -69,13 +69,13 @@ func (l *Logic) GetPermission() Permission {
 }
 
 // SetTokenAction 设置token操作接口
-func (l *Logic) SetTokenAction(action tokenAction) *Logic {
+func (l *Logic) SetTokenAction(action TokenAction) *Logic {
 	l.tokenAction = action
 	return l
 }
 
 // GetTokenAction 设置token操作接口
-func (l *Logic) GetTokenAction() tokenAction {
+func (l *Logic) GetTokenAction() TokenAction {
 	if l.tokenAction == nil {
 		l.tokenAction = newDefaultAction(l)
 	}
@@ -250,7 +250,7 @@ func (l *Logic) Replaced(loginId string, device string) TokenError {
 // 形参
 // tokenValue -- token值
 func (l *Logic) IsLogin(tokenValue string) bool {
-	return len(l.GetLoginIdDefaultNull(tokenValue)) == 0
+	return len(l.GetLoginIdDefaultNull(tokenValue)) != 0
 }
 
 // CheckLogin 查询指定token是否登录
@@ -325,7 +325,7 @@ func (l *Logic) GetLoginIdDefaultNull(tokenValue string) string {
 		return ""
 	}
 	// 如果已经[临时过期]
-	if l.GetTokenActivityTimeoutByToken(loginId) == NOT_VALUE_EXPIRE {
+	if l.GetTokenActivityTimeoutByToken(tokenValue) == NOT_VALUE_EXPIRE {
 		return ""
 	}
 	return loginId
@@ -420,14 +420,6 @@ func (l *Logic) GetDisableTime(loginId string) int64 {
 //tokenValue – token值
 func (l *Logic) DeleteTokenSession(tokenValue string) {
 	l.GetStorage().Del(l.splicingTokenSessionKey(tokenValue))
-}
-
-// GetTokenSessionByToken 获取指定token的session
-// 形参
-// tokenValue - 指定的token
-// isCreate - 是否创建
-func (l *Logic) GetTokenSessionByToken(tokenValue string, isCreate bool) *session {
-	return l.GetSessionBySessionId(l.splicingTokenSessionKey(tokenValue), isCreate)
 }
 
 // ================== user-session相关 =================
@@ -582,7 +574,7 @@ func (l *Logic) HasRole(loginId string, role string) bool {
 	if err != nil {
 		return false
 	}
-	return object.Contains[string](list, role)
+	return objectx.Contains[string](list, role)
 }
 
 // HasRoleAnd 判断：当前账号是否含有指定角色标识 [指定多个，必须全部验证通过]
@@ -595,7 +587,7 @@ func (l *Logic) HasRoleAnd(loginId string, roleArray ...string) bool {
 		return false
 	}
 	for _, s := range roleArray {
-		if !object.Contains(list, s) {
+		if !objectx.Contains(list, s) {
 			return false
 		}
 	}
@@ -613,7 +605,7 @@ func (l *Logic) CheckRoleOr(loginId string, roleArray ...string) bool {
 	}
 	// 找到任意一个角色就返回
 	for _, s := range roleArray {
-		if object.Contains(list, s) {
+		if objectx.Contains(list, s) {
 			return true
 		}
 	}
@@ -642,7 +634,7 @@ func (l *Logic) HasPermission(loginId string, permission string) bool {
 	if err != nil {
 		return false
 	}
-	return object.Contains(slice, permission)
+	return objectx.Contains(slice, permission)
 }
 
 // HasPermissionAnd 判断：指定账号是否含有指定权限, [指定多个，必须全部具有]
@@ -656,7 +648,7 @@ func (l *Logic) HasPermissionAnd(loginId string, permissionArray ...string) bool
 	}
 	// 必须包含所有的权限
 	for _, s := range permissionArray {
-		if !object.Contains(slice, s) {
+		if !objectx.Contains(slice, s) {
 			return false
 		}
 	}
@@ -674,7 +666,7 @@ func (l *Logic) HasPermissionOr(loginId string, permissionArray ...string) bool 
 	}
 	// 有任意一个权限即可
 	for _, s := range permissionArray {
-		if object.Contains(slice, s) {
+		if objectx.Contains(slice, s) {
 			return true
 		}
 	}
@@ -714,14 +706,14 @@ func (l *Logic) splicingLastActivityTimeKey(tokenValue string) string {
 	return l.GetTokenName() + ":" + l.logicType + ":last-activity:" + tokenValue
 }
 
-// splicingTokenValueKey 拼接tokenValueKey
-func (l *Logic) splicingTokenValueKey(tokenValue string) string {
-	return l.config.TokenName + ":" + l.logicType + ":token:" + tokenValue
-}
-
 // splicingTokenSessionKey 拼接tokenSessionKey
 func (l *Logic) splicingTokenSessionKey(tokenValue string) string {
 	return l.GetTokenName() + ":" + l.logicType + ":token-session:" + tokenValue
+}
+
+// splicingTokenValueKey 拼接tokenValueKey
+func (l *Logic) splicingTokenValueKey(tokenValue string) string {
+	return l.config.TokenName + ":" + l.logicType + ":token:" + tokenValue
 }
 
 // splicingSwitchKey 凭借切换用户key

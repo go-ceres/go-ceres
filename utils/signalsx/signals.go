@@ -13,11 +13,28 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package old
+package signalsx
 
 import (
-	"math/rand"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+var shutdownSignals = []os.Signal{
+	syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGKILL,
+}
+
+func Shutdown(stop func(grace bool)) {
+	ch := make(chan os.Signal, 2)
+	signal.Notify(
+		ch,
+		shutdownSignals...,
+	)
+	go func() {
+		s := <-ch
+		go stop(s != syscall.SIGQUIT)
+		<-ch
+		os.Exit(128 + int(s.(syscall.Signal))) // second signal. Exit directly.
+	}()
+}

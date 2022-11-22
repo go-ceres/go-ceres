@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +13,11 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package old
+package objectx
 
-// Point 随机生成的抠图位置
-type Point struct {
-	X int
-	Y int
-}
+import "github.com/jinzhu/copier"
 
-// CutoutRet 抠图出来的结果
-type CutoutRet struct {
-	Point        *Point
-	BackgroudImg string
-	BlockImg     string
+// Copy 结构体映射
+func Copy(toValue interface{}, fromValue interface{}) error {
+	return copier.Copy(toValue, fromValue)
 }

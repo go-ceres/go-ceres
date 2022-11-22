@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +13,16 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package old
+package objectx
 
-import "errors"
-
-const slipOffset = 5.0
-
-var (
-	ErrPostionErr = errors.New("postion error")
-)
-
-// Check 验证位置是否正确
-func Check(paramInPoint *Point, cachedPoint *Point) error {
-	if cachedPoint.X-slipOffset > paramInPoint.X ||
-		paramInPoint.X > cachedPoint.X+slipOffset {
-		return ErrPostionErr
+func Contains[T comparable](slice []T, obj T) bool {
+	if len(slice) == 0 {
+		return false
 	}
-	return nil
+	for _, t := range slice {
+		if t == obj {
+			return true
+		}
+	}
+	return false
 }

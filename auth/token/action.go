@@ -15,7 +15,7 @@
 
 package token
 
-// tokenAction token相关操作
-type tokenAction interface {
+// TokenAction token相关操作
+type TokenAction interface {
 	createToken(loginId string, logicType string, device string) string
 }
