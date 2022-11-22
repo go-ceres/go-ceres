@@ -20,6 +20,7 @@ import (
 
 type Engine struct {
 	isSetup      bool               // 是否设置
+	init         []func() error     // 启动项方法
 	rw           *sync.RWMutex      // 读写锁
 	cycle        *cycle.Cycle       // 异步运行管理
 	servers      []server.Server    // 服务
@@ -61,14 +62,16 @@ func (eng *Engine) initialize() {
 
 // setup 初始化组件
 func (eng *Engine) setup() (err error) {
+	init := []func() error{
+		eng.initCmd,
+		eng.printBanner,
+		eng.initLogger,
+		eng.initMaxProcs,
+		eng.initCron,
+	}
+	init = append(init, eng.init...)
 	eng.setupOnce.Do(func() {
-		err = eng.serialUntilError(
-			eng.initCmd,
-			eng.printBanner,
-			eng.initLogger,
-			eng.initMaxProcs,
-			eng.initCron,
-		)
+		err = eng.serialUntilError(init...)
 		eng.isSetup = true
 	})
 	return
@@ -85,6 +88,12 @@ func (eng *Engine) initCmd() error {
 		return true
 	})
 	return cmd.DefaultCmd.Init(opts...)
+}
+
+// SetInit 设置启动项
+func (eng *Engine) SetInit(fns ...func() error) *Engine {
+	eng.init = append(eng.init, fns...)
+	return eng
 }
 
 // MustSetup 必须初始化

@@ -18,6 +18,7 @@ package grpc
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/go-ceres/go-ceres/client/grpc/resolver"
 	"google.golang.org/grpc"
 	"strings"
@@ -43,7 +44,8 @@ func newClient(c *Config) *Client {
 		dialOptions = append(dialOptions, grpc.WithKeepaliveParams(*c.KeepAlive))
 	}
 	// 负载均衡策略
-	dialOptions = append(dialOptions, grpc.WithBalancerName(c.Balancer))
+	svcCfg := fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, c.Balancer)
+	dialOptions = append(dialOptions, grpc.WithDefaultServiceConfig(svcCfg))
 	// 注册非注册中心的调用
 	resolver.RegisterDirect()
 	// 注册有注册中心的

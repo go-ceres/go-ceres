@@ -15,7 +15,7 @@ type Config struct {
 	Ctx        context.Context
 }
 
-// 默认的配置信息
+// DefaultConfig 默认的配置信息
 func DefaultConfig() *Config {
 	conf := &Config{
 		Config: &clientv3.Config{
@@ -43,19 +43,19 @@ func ScanConfig(name string) *Config {
 	return RawConfig("ceres.config.source.etcd." + name)
 }
 
-// Addr 连接地址
+// WithEndpoints 连接地址
 func (c *Config) WithEndpoints(addrs ...string) *Config {
 	c.Endpoints = addrs
 	return c
 }
 
-// Prefix 前缀
+// WithPrefix 前缀
 func (c *Config) WithPrefix(prefix string) *Config {
 	c.Prefix = prefix
 	return c
 }
 
-// TrimPrefix 去掉前缀前缀
+// WithStripPrefix 去掉前缀前缀
 func (c *Config) WithStripPrefix(trimPrefix string) *Config {
 	c.TrimPrefix = trimPrefix
 	return c

@@ -15,7 +15,7 @@
 
 package gorm
 
-import "gorm.io/driver/mysql"
+import "github.com/go-ceres/go-ceres/store/gorm/driver/mysql"
 
 var drivers = map[string]DriverFunc{
 	"mysql": func(dns string) Dialector {

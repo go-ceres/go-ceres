@@ -1,4 +1,4 @@
-//    Copyright 2021. Go-Ceres
+//    Copyright 2022. Go-Ceres
 //    Author https://github.com/go-ceres/go-ceres
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,61 +13,52 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-package file
+package etcd
 
 import (
 	"github.com/go-ceres/cli/v2"
 	"github.com/go-ceres/go-ceres/cmd"
 	"github.com/go-ceres/go-ceres/config"
 	"github.com/go-ceres/go-ceres/logger"
-	"github.com/go-ceres/go-ceres/source/file"
+	"github.com/go-ceres/go-ceres/source/etcd"
 )
 
-// filePlugin
-type filePlugin struct {
-	source config.Source
+type etcdPlugin struct {
 }
 
 // Name 插件名称
-func (f *filePlugin) Name() string {
-	return "config.source.file"
+func (f *etcdPlugin) Name() string {
+	return "config.source.etcd"
 }
 
 // Flags 需要注册的Flag命令
-func (f *filePlugin) Flags() []cli.Flag {
+func (f *etcdPlugin) Flags() []cli.Flag {
 	return []cli.Flag{
-		&cli.StringFlag{
-			Name:    "file",
-			Aliases: []string{"f"},
+		&cli.StringSliceFlag{
+			Name:    "endpoints",
+			Aliases: []string{"e"},
 			Usage:   "configuration file path",
-			EnvVars: []string{"CERES_CONFIG_FILE"},
+			EnvVars: []string{"CERES_CONFIG_ENDPOINTS"},
 		}, &cli.StringFlag{
 			Name:    "decode",
 			Aliases: []string{"d"},
 			Usage:   "profile decoder",
 			EnvVars: []string{"CERES_CONFIG_DECODE"},
 		}, &cli.BoolFlag{
-			Name:    "watch",
-			Aliases: []string{"w"},
-			Usage:   "Whether to monitor configuration changes",
-			EnvVars: []string{"CERES_CONFIG_WATCH"},
+			Name:    "prefix",
+			Aliases: []string{"p"},
+			Usage:   "etcd path prefix",
+			EnvVars: []string{"CERES_CONFIG_PREFIX"},
 		},
 	}
 }
 
 // Init 初始化方法
-func (f *filePlugin) Init(ctx *cli.Context) error {
-	path := ctx.String("file")
-	if path == "" {
-		path = "./manifest/config/config.toml"
-	}
-	var opts []file.Option
-	decode := ctx.String("decode")
-	if decode != "" {
-		opts = append(opts, file.Unmarshal(decode))
-	}
-	f.source = file.NewSource(path, opts...)
-	err := config.Load(f.source)
+func (f *etcdPlugin) Init(ctx *cli.Context) error {
+	conf := etcd.DefaultConfig()
+	conf.Endpoints = ctx.StringSlice("endpoints")
+	conf.Encoding = ctx.String("decode")
+	err := config.Load(conf.Build())
 	if err != nil {
 		return err
 	}
@@ -75,17 +66,17 @@ func (f *filePlugin) Init(ctx *cli.Context) error {
 }
 
 // Config 当配置组件初始化完成后
-func (f *filePlugin) Config() error {
+func (f *etcdPlugin) Config() error {
 	panic("implement me")
 }
 
 // Destroy 当服务销毁时调用
-func (f *filePlugin) Destroy() {
+func (f *etcdPlugin) Destroy() {
 	panic("implement me")
 }
 
 func init() {
-	p := &filePlugin{}
+	p := &etcdPlugin{}
 	err := cmd.RegisterPlugin(p)
 	if err != nil {
 		logger.FrameLogger.Panicd("register plugin", logger.FieldErr(err))

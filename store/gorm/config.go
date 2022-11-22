@@ -118,6 +118,8 @@ func (c *Config) WithDialector(dialect Dialector) *Config {
 
 // Build 构建gorm数据库链接
 func (c *Config) Build() *DB {
+	// 初始化日志
+	c.initLogger()
 	// 创建驱动
 	if driver, ok := drivers[c.Drive]; !ok {
 		c.logger.Panicd(fmt.Sprintf("%s driver is not set", c.Drive))

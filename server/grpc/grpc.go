@@ -20,6 +20,7 @@ import (
 	"github.com/go-ceres/go-ceres/server"
 	"google.golang.org/grpc"
 	"net"
+	"time"
 )
 
 type grpcServer struct {
@@ -76,6 +77,12 @@ func (s *grpcServer) Stop() error {
 func (s *grpcServer) Info() *server.ServiceInfo {
 	address := s.listener.Addr().String()
 	ip, port, _ := net.SplitHostPort(address)
+	internalIp := s.getInterfaceIp()
+	if ip == "0.0.0.0" {
+		if s.ping(internalIp + ":" + port) {
+			ip = internalIp
+		}
+	}
 	if s.Config.PlainTextAddress != "" {
 		ip = s.Config.PlainTextAddress
 	}
@@ -86,4 +93,33 @@ func (s *grpcServer) Info() *server.ServiceInfo {
 		server.WithMetadata("app_host", address),
 	)
 	return info
+}
+
+// Ping 检查ip是否能通
+func (s *grpcServer) ping(addr string) bool {
+	// 3 秒超时
+	conn, err := net.DialTimeout("tcp", addr, 3*time.Second)
+	if err != nil {
+		return false
+	} else {
+		if conn != nil {
+			_ = conn.Close()
+			return true
+		}
+		return false
+	}
+}
+
+// getInterfaceIp 获取内网ip
+func (s *grpcServer) getInterfaceIp() string {
+	addrs, _ := net.InterfaceAddrs()
+	for _, addr := range addrs {
+
+		if ipNet, isIpNet := addr.(*net.IPNet); isIpNet && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				return ipNet.IP.String()
+			}
+		}
+	}
+	return ""
 }
